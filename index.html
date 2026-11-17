@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tablero de indicadores · TP2 Biblioteca</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:wght@500;600&family=Public+Sans:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#eef2f6;--card:#fff;--ink:#14232e;--mute:#566673;--line:#d5dde5;--track:#e3e9ef;--ok:#0f766e;--okbg:#d9f0ec;--warn:#b45309;--warnbg:#fdecd3;--bad:#b91c1c;--badbg:#fbdede;--sim:#6b4fa3;--bar:#2f5d7c;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e171e;--card:#16232d;--ink:#e6edf2;--mute:#9db0bd;--line:#2a3b47;--track:#243542;--ok:#4fd1c0;--okbg:#12383a;--warn:#f6ad55;--warnbg:#3b2a12;--bad:#fc8181;--badbg:#431f1f;--sim:#b9a2f0;--bar:#6fa8cf;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e171e;--card:#16232d;--ink:#e6edf2;--mute:#9db0bd;--line:#2a3b47;--track:#243542;--ok:#4fd1c0;--okbg:#12383a;--warn:#f6ad55;--warnbg:#3b2a12;--bad:#fc8181;--badbg:#431f1f;--sim:#b9a2f0;--bar:#6fa8cf;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 "Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:1040px;margin:0 auto;padding:32px 20px 48px}
+h1{font:600 clamp(26px,5vw,38px)/1.15 "Newsreader",Georgia,"Times New Roman",serif;margin:0 0 6px}
+h2{font:600 18px/1.3 "Newsreader",Georgia,serif;margin:0}
+.sub{color:var(--mute);margin:0 0 24px;max-width:62ch}
+.ok{--st:var(--ok);--stbg:var(--okbg)}.warn{--st:var(--warn);--stbg:var(--warnbg)}.bad{--st:var(--bad);--stbg:var(--badbg)}
+.status{display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 20px;margin-bottom:20px}
+.status b{font:600 22px "Newsreader",Georgia,serif}
+.dots{display:flex;gap:8px}
+.dot{width:18px;height:18px;border-radius:50%;background:var(--st);box-shadow:0 0 0 3px var(--stbg)}
+.k{color:var(--mute);font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(6,1fr);gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.card.sim{border-style:dashed;border-color:var(--sim)}
+.c1,.c2,.c4,.c5{grid-column:span 3}.c3{grid-column:span 6}
+.head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.badge,.pill{font-size:13px;font-weight:600;padding:3px 10px;border-radius:99px;white-space:nowrap}
+.badge{background:var(--stbg);color:var(--st)}
+.pill{border:1px dashed var(--sim);color:var(--sim)}
+.big{font:600 44px/1 "Newsreader",Georgia,serif}
+.big small{font:500 16px "Public Sans",sans-serif;color:var(--mute);margin-left:6px}
+.meta{color:var(--mute);font-size:14px;margin:0}
+.mg{color:var(--st);font-weight:600}
+.segs{display:grid;gap:6px}
+.segs i{height:12px;border-radius:4px;background:var(--track)}
+.segs i.f{background:var(--st)}
+.ringrow{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.ring{width:120px;height:120px;border-radius:50%;background:conic-gradient(var(--st) 0 var(--p),var(--track) 0);display:grid;place-items:center;flex:none}
+.ring div{width:88px;height:88px;border-radius:50%;background:var(--card);display:grid;place-items:center;font:600 20px "Newsreader",Georgia,serif}
+.rows{display:grid;gap:10px}
+.row{display:grid;grid-template-columns:minmax(120px,210px) 1fr 44px;gap:12px;align-items:center;font-size:14px}
+.bar{height:10px;border-radius:99px;background:var(--track);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--bar);border-radius:99px}
+.row b{text-align:right;font-variant-numeric:tabular-nums}
+.flow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-weight:600}
+.flow span{padding:4px 12px;border-radius:8px}
+.flow .a{background:var(--warnbg);color:var(--warn)}.flow .b{background:var(--okbg);color:var(--ok)}
+.stars{font-size:22px;letter-spacing:3px;color:var(--st)}
+details{margin-top:20px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 20px}
+summary{cursor:pointer;font-weight:600}
+summary:focus-visible,input:focus-visible,button:focus-visible{outline:2px solid var(--bar);outline-offset:2px}
+.ed{display:grid;gap:10px;margin-top:14px}
+.ed div{display:grid;grid-template-columns:1fr 90px 90px;gap:10px;align-items:center;font-size:14px}
+.ed .h{color:var(--mute)}
+input{font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);width:100%}
+button{font:inherit;font-weight:600;margin-top:14px;padding:8px 16px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+footer{margin-top:24px;color:var(--mute);font-size:14px;display:grid;gap:6px}
+footer p{margin:0;max-width:80ch}
+@media (max-width:720px){.c1,.c2,.c3,.c4,.c5{grid-column:span 6}.row{grid-template-columns:1fr 44px}.row .bar{grid-column:1/-1;order:3}.ed div{grid-template-columns:1fr 70px 70px}}
+</style>
+</head>
+<body>
+<main>
+<h1>Tablero de indicadores: TP2 Biblioteca</h1>
+<p class="sub">API de biblioteca con FastAPI y SQLModel (autores, libros, socios y préstamos). Estado del proyecto al 17/11/2026, con datos de la última corrida de pytest.</p>
+<section class="status" aria-label="Estado general" id="status"></section>
+<div class="grid" id="grid"></div>
+<details>
+  <summary>Editar datos (los cambios solo se ven en tu navegador)</summary>
+  <div class="ed" id="ed"></div>
+  <button type="button" id="reset">Restablecer datos originales</button>
+</details>
+<footer>
+  <p>Fuente: salida de <code>pytest --cov</code> del 17/11/2026 y registro de etapas del proyecto.</p>
+  <p>Semáforo: verde cumple la meta, amarillo está hasta 5 % por debajo, rojo más de 5 % por debajo. Debajo de cada indicador se muestra el margen sobre la meta. Los datos de satisfacción son ilustrativos y están marcados como tales; los otros cuatro indicadores son reales.</p>
+</footer>
+</main>
+<script>
+const BASE=[
+ {id:'avance',t:'Avance por etapas',valor:5,meta:5,sim:false},
+ {id:'cob',t:'Cobertura de tests (%)',valor:99.87,meta:80,sim:false},
+ {id:'tests',t:'Tests pytest aprobados',valor:179,meta:179,sim:false},
+ {id:'def',t:'Defectos corregidos',valor:1,meta:1,sim:false},
+ {id:'sat',t:'Satisfacción (de 5)',valor:4.5,meta:4,sim:true}
+];
+const GRUPOS=[['API (endpoints)',146],['Config, BD, errores, health, seed',19],['Repositorios',8],['Servicios (reglas de préstamos)',6]];
+let K=JSON.parse(JSON.stringify(BASE));
+const f=n=>String(+Number(n).toFixed(2)).replace('.',',');
+const est=k=>{const r=k.valor/k.meta;return r>=1?'ok':r>=0.95?'warn':'bad'};
+const LAB={ok:'● Cumple',warn:'● En riesgo',bad:'● No cumple'};
+const U={avance:'etapas',cob:'pts',tests:'tests',def:'defectos',sat:'pts'};
+function margen(k){const d=k.valor-k.meta,u=U[k.id];if(d>0)return `Margen sobre la meta: +${f(d)} ${u}`;if(d===0)return `Justo en la meta: margen de 0 ${u}`;return `Faltan ${f(-d)} ${u} para la meta`}
+function body(k){
+ if(k.id==='avance'){const n=Math.max(1,Math.round(k.meta));return `<div class="big">${f(Math.min(100,k.valor/k.meta*100))} %<small>${f(k.valor)} de ${f(k.meta)} etapas</small></div><div class="segs" style="grid-template-columns:repeat(${n},1fr)" role="img" aria-label="${f(k.valor)} etapas de ${f(k.meta)}">${Array.from({length:n},(_,i)=>`<i class="${i<k.valor?'f':''}"></i>`).join('')}</div><p class="meta">4 etapas de desarrollo y 1 de revisión y mejoras, cada una cerrada tras pruebas manuales. Meta: ${f(k.meta)} de ${f(k.meta)}.</p>`}
+ if(k.id==='cob')return `<div class="ringrow"><div class="ring" style="--p:${Math.min(100,k.valor)}%" role="img" aria-label="Cobertura ${f(k.valor)} por ciento"><div>${f(k.valor)} %</div></div><div><p class="meta">Meta mínima exigida: ${f(k.meta)} %</p><p class="meta">721 sentencias, 0 sin cubrir</p><p class="meta">68 ramas, 1 parcial (database.py)</p></div></div>`;
+ if(k.id==='tests')return `<div class="big">${f(k.valor)}<small>tests aprobados de ${f(k.meta)}, en 4,19 s</small></div><div class="rows">${GRUPOS.map(g=>`<div class="row"><span>${g[0]}</span><div class="bar"><i style="width:${g[1]/146*100}%"></i></div><b>${g[1]}</b></div>`).join('')}</div><p class="meta">Además de pytest, hubo pruebas manuales sobre el sistema en marcha antes de cerrar cada etapa (sin conteo).</p>`;
+ if(k.id==='def')return `<div class="big">${f(k.valor)} de ${f(k.meta)}<small>corregido en la revisión final</small></div><div class="flow"><span class="a">ids enormes: error 500</span><span aria-hidden="true">→</span><span class="b">error 422 controlado</span></div><p class="meta">Cubierto con 23 tests nuevos. Meta: cero defectos abiertos conocidos.</p>`;
+ const full=Math.floor(k.valor),half=k.valor%1>=0.5;
+ return `<div class="big">${f(k.valor)}<small>de 5, aceptación del entregable</small></div><div class="stars" role="img" aria-label="${f(k.valor)} estrellas de 5">${'★'.repeat(full)}${half?'½':''}</div><p class="meta">Valor simulado: el proyecto no tuvo usuarios finales. Meta: ${f(k.meta)} o más.</p>`;
+}
+function render(){
+ const s=K.map(est),n=s.filter(x=>x==='ok').length,sims=K.filter(k=>k.sim).length;
+ document.getElementById('status').innerHTML=`<div><b>${n} de ${K.length} indicadores cumplen su meta</b><br><span class="k">${K.length-sims} con datos reales, ${sims} con dato ilustrativo</span></div><div class="dots" aria-hidden="true">${s.map(x=>`<i class="dot ${x}"></i>`).join('')}</div><span class="k">Verde cumple · Amarillo en riesgo · Rojo no cumple</span>`;
+ document.getElementById('grid').innerHTML=K.map((k,i)=>`<article class="card c${i+1} ${s[i]}${k.sim?' sim':''}"><div class="head"><h2>${k.t.replace(/ \(.*\)/,'')}</h2><div class="tags"><span class="badge">${LAB[s[i]]}</span>${k.sim?'<span class="pill">Dato ilustrativo</span>':''}</div></div>${body(k)}<p class="meta mg">${margen(k)}</p></article>`).join('');
+}
+function editor(){
+ document.getElementById('ed').innerHTML='<div class="h"><span>Indicador</span><span>Valor</span><span>Meta</span></div>'+K.map((k,i)=>`<div><label for="v${i}">${k.t}</label><input id="v${i}" type="number" step="any" value="${k.valor}" data-i="${i}" data-c="valor" aria-label="Valor de ${k.t}"><input type="number" step="any" min="0.01" value="${k.meta}" data-i="${i}" data-c="meta" aria-label="Meta de ${k.t}"></div>`).join('');
+}
+document.getElementById('ed').addEventListener('input',e=>{
+ const t=e.target,v=parseFloat(t.value);
+ if(!t.dataset.c||isNaN(v)||(t.dataset.c==='meta'&&v<=0))return;
+ K[t.dataset.i][t.dataset.c]=v;render();
+});
+document.getElementById('reset').addEventListener('click',()=>{K=JSON.parse(JSON.stringify(BASE));editor();render()});
+editor();render();
+</script>
+</body>
+</html>
